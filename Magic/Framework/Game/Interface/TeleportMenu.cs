@@ -80,8 +80,7 @@ namespace Magic.Framework.Game.Interface
 
                 Game1.playSound("wand");
                 Game1.warpFarmer(this.WarpTo, (int)cloud.Tile.X, (int)cloud.Tile.Y, false);
-                var travelCore = Game1.player.Items.FirstOrDefault(u => u.DisplayName == "Travel Core");
-                Game1.player.Items.ReduceId(travelCore.ItemId, 1);
+                Game1.player.Items.ReduceId("Travel_Core", 1);
                 Game1.player.AddCustomSkillExperience(Magic.Skill, 25);
             }
 
