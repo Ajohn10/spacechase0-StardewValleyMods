@@ -1,3 +1,4 @@
+using System.Linq;
 using Magic.Framework.Game.Interface;
 using Magic.Framework.Schools;
 using StardewValley;
@@ -19,7 +20,7 @@ namespace Magic.Framework.Spells
 
         public override bool CanCast(Farmer player, int level)
         {
-            return base.CanCast(player, level) && player.currentLocation.IsOutdoors && player.mount == null && player.hasItemInInventory(Mod.Ja.GetObjectId("Travel Core"), 1);
+            return base.CanCast(player, level) && player.currentLocation.IsOutdoors && player.mount == null && player.Items.ContainsId("Travel_Core");
         }
 
         public override int GetManaCost(Farmer player, int level)

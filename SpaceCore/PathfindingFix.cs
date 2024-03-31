@@ -213,7 +213,7 @@ internal static class Rescheduler
 #endif
 
         Stopwatch timer = Stopwatch.StartNew();
-        HashSet<string> handled = [];
+        HashSet<string> handled = new HashSet<string>();
 
         try
         {
@@ -386,7 +386,7 @@ internal static class Rescheduler
         {
             _queue.Value ??= new();
             _queue.Value.Clear();
-            _visited.Value ??= [];
+            _visited.Value ??= new HashSet<string>();
             _visited.Value.Clear();
 
             // seed with initial
@@ -518,7 +518,7 @@ internal static class Rescheduler
                 };
 
                 SpaceCore.SpaceCore.Instance.Monitor.Log($"Scheduler could not find route from {start.Name} to {end.Name} while honoring Gender {PathfindingGenderstring}", LogLevel.Warn);
-                InsertRoute(start.Name, end.Name, Gender, []);
+                InsertRoute(start.Name, end.Name, Gender, new string[0]);
             }
             return null;
         }
@@ -764,7 +764,7 @@ internal static class Rescheduler
             return;
         }
 
-        _dedup.Value ??= [];
+        _dedup.Value ??= new HashSet<string>();
         _dedup.Value.Clear();
         if (location.warps?.Count is not null and not 0)
         {

@@ -340,7 +340,7 @@ namespace SpaceCore
                             {
                                 methLocals[s_].Add(lv.Index);
                             }
-                            else methLocals.Add(s_, [lv.Index]);
+                            else methLocals.Add(s_, new List<int> { lv.Index });
                         }
                     }
 

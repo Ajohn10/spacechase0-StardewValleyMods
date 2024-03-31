@@ -45,6 +45,8 @@ namespace Magic.Framework.Commands
             report.AppendLine($"   Learned magic: {Magic.LearnedMagic}");
             report.AppendLine($"   Current mana:  {player.GetCurrentMana()} / {player.GetMaxMana()}");
             report.AppendLine($"   Unused points: {spellBook.FreePoints}");
+            report.AppendLine($"   Magic Level: {player.GetCustomSkillLevel(Magic.Skill)}");
+            report.AppendLine($"   Magic experience: {player.GetCustomSkillExperience(Magic.Skill)}");
             report.AppendLine();
 
             // professions

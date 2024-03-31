@@ -47,7 +47,7 @@ namespace Magic.Framework
         public const string MsgCast = "spacechase0.Magic.Cast";
 
         /// <summary>Whether the current player learned magic.</summary>
-        public static bool LearnedMagic => Game1.player?.eventsSeen?.Contains(MagicConstants.LearnedMagicEventId) == true;
+        public static bool LearnedMagic => Game1.player?.eventsSeen?.Contains(MagicConstants.LearnedMagicEventId.ToString()) == true;
 
 
         /*********
@@ -70,7 +70,6 @@ namespace Magic.Framework
             events.Player.Warped += Magic.OnWarped;
 
             SpaceEvents.OnItemEaten += Magic.OnItemEaten;
-            SpaceEvents.ActionActivated += Magic.ActionTriggered;
             Networking.RegisterMessageHandler(Magic.MsgCast, Magic.OnNetworkCast);
 
             events.Display.RenderingHud += Magic.OnRenderingHud;
@@ -102,7 +101,7 @@ namespace Magic.Framework
 
             // get magic info
             int magicLevel = overrideMagicLevel ?? player.GetCustomSkillLevel(Skill.MagicSkillId);
-            SpellBook spellBook = Game1.player.GetSpellBook();
+            SpellBook spellBook = player.GetSpellBook();
 
             // fix mana pool
             {
@@ -337,10 +336,12 @@ namespace Magic.Framework
             // update spells
             EvacSpell.OnLocationChanged();
 
+            int positionModifier = Mod.HasStardewValleyExpanded ? 17 : 5;
+
             // check events
             if (e.NewLocation.Name == "WizardHouse" && !Magic.LearnedMagic && Game1.player.friendshipData.TryGetValue("Wizard", out Friendship wizardFriendship) && wizardFriendship.Points >= 750)
             {
-                string eventStr = "WizardSong/0 5/Wizard 8 5 0 farmer 8 15 0/skippable/ignoreCollisions farmer/move farmer 0 -8 0/speak Wizard \"{0}#$b#{1}#$b#{2}#$b#{3}#$b#{4}#$b#{5}#$b#{6}#$b#{7}#$b#{8}\"/textAboveHead Wizard \"{9}\"/pause 750/fade 750/end";
+                string eventStr = "WizardSong/0 " + positionModifier + "/Wizard 8 " + positionModifier + " 0 farmer 8 " + (positionModifier+10) + " 0/skippable/ignoreCollisions farmer/move farmer 0 -8 0/speak Wizard \"{0}#$b#{1}#$b#{2}#$b#{3}#$b#{4}#$b#{5}#$b#{6}#$b#{7}#$b#{8}\"/textAboveHead Wizard \"{9}\"/pause 750/fade 750/end";
                 eventStr = string.Format(
                     eventStr,
                     I18n.Event_Wizard_1(),
@@ -354,7 +355,7 @@ namespace Magic.Framework
                     I18n.Event_Wizard_9(),
                     I18n.Event_Wizard_Abovehead()
                 );
-                e.NewLocation.currentEvent = new Event(eventStr, MagicConstants.LearnedMagicEventId);
+                e.NewLocation.currentEvent = new Event(eventStr, null, MagicConstants.LearnedMagicEventId.ToString());
                 Game1.eventUp = true;
                 Game1.displayHUD = false;
                 Game1.player.CanMove = false;
@@ -362,22 +363,20 @@ namespace Magic.Framework
 
                 Game1.player.AddCustomSkillExperience(Magic.Skill, Magic.Skill.ExperienceCurve[0]);
                 Magic.FixMagicIfNeeded(Game1.player, overrideMagicLevel: 1); // let player start using magic immediately
-                Game1.player.eventsSeen.Add(MagicConstants.LearnedMagicEventId);
+                Game1.player.eventsSeen.Add(MagicConstants.LearnedMagicEventId.ToString());
             }
         }
 
-        private static void ActionTriggered(object sender, EventArgsAction args)
+        internal static bool HandleMagicAltar(GameLocation location, string[] args, Farmer player, Microsoft.Xna.Framework.Point point)
         {
-            switch (args.Action)
-            {
-                case "MagicAltar":
-                    Magic.OnAltarClicked();
-                    break;
+            OnAltarClicked();
+            return true;
+        }
 
-                case "MagicRadio":
-                    Magic.OnRadioClicked();
-                    break;
-            }
+        internal static bool HandleMagicRadio(GameLocation location, string[] args, Farmer player, Microsoft.Xna.Framework.Point point)
+        {
+            Magic.OnRadioClicked();
+            return true;
         }
 
         /// <summary>Handle an interaction with the magic altar.</summary>
@@ -430,7 +429,7 @@ namespace Magic.Framework
                 Log.Warn("No item eaten for the item eat event?!?");
                 return;
             }
-            if (Game1.player.itemToEat.ParentSheetIndex == Mod.Ja.GetObjectId("Magic Elixir"))
+            if (Game1.player.itemToEat.DisplayName == "Magic Elixir")
                 Game1.player.AddMana(Game1.player.GetMaxMana());
         }
     }

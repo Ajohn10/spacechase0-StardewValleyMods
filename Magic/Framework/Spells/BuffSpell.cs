@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Magic.Framework.Schools;
 using SpaceCore;
 using StardewValley;
@@ -16,11 +18,7 @@ namespace Magic.Framework.Spells
         {
             if (player == Game1.player)
             {
-                foreach (var buff in Game1.buffsDisplay.otherBuffs)
-                {
-                    if (buff.source == "spell:life:buff")
-                        return false;
-                }
+                return !player.buffs.AppliedBuffs.Values.Any(u => u.source == "spell:life:buff");
             }
 
             return base.CanCast(player, level);
@@ -36,14 +34,8 @@ namespace Magic.Framework.Spells
             if (player != Game1.player)
                 return null;
 
-            foreach (var buff in Game1.buffsDisplay.otherBuffs)
-            {
-                if (buff.source == "spell:life:buff")
-                    return null;
-            }
-
-            Game1.player.removeBuffAttributes();
-            Game1.player.attack = 0;
+            if (player.buffs.AppliedBuffs.Values.Any(u => u.source == "spell:life:buff"))
+                return null;
 
             int l = level + 1;
             int farm = l, fish = l, mine = l, luck = l, forage = l, def = 0 /*1*/, atk = 2;
@@ -54,7 +46,23 @@ namespace Magic.Framework.Spells
                 _ => atk
             };
 
-            Game1.buffsDisplay.addOtherBuff(new Buff(farm, fish, mine, 0, luck, forage, 0, 0, 0, 0, def, atk, 60 + level * 120, "spell:life:buff", "Buff (spell)"));
+            player.buffs.Apply(new Buff(
+                id: "spacechase0.magic.buff",
+                source: "spell:life:buff",
+                displaySource: "Buff (spell)",
+                duration: (int)TimeSpan.FromSeconds(60 + level * 120).TotalMilliseconds,
+                effects: new StardewValley.Buffs.BuffEffects
+                {
+                    FarmingLevel = { farm },
+                    FishingLevel = { fish },
+                    MiningLevel = { mine },
+                    LuckLevel = { luck },
+                    ForagingLevel = { forage },
+                    Defense = { def },
+                    Attack = { atk },
+                }
+            ));
+
             player.AddCustomSkillExperience(Magic.Skill, 10);
             return null;
         }

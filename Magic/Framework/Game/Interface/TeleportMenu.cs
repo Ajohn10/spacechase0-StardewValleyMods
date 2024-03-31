@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceCore;
@@ -36,8 +37,6 @@ namespace Magic.Framework.Game.Interface
         public TeleportMenu()
             : base((Game1.viewport.Width - TeleportMenu.WindowWidth) / 2, (Game1.viewport.Height - TeleportMenu.WindowHeight) / 2, TeleportMenu.WindowWidth, TeleportMenu.WindowHeight)
         {
-            this.gamePadControlsImplemented = false;
-
             foreach (var loc in Game1.locations)
             {
                 if (loc.IsOutdoors && !(loc.Name.StartsWith("SDM") && loc.Name.EndsWith("Farm")))
@@ -71,7 +70,7 @@ namespace Magic.Framework.Game.Interface
                     currentLocation = locObj,
                     Position = new Vector2(mapW * Game1.tileSize / 2, mapH * Game1.tileSize / 2)
                 };
-                Vector2 tileForCharacter = Utility.recursiveFindOpenTileForCharacter(cloud, locObj, cloud.getTileLocation(), 9 * 9);
+                Vector2 tileForCharacter = Utility.recursiveFindOpenTileForCharacter(cloud, locObj, cloud.Tile, 9 * 9);
                 cloud.Position = new Vector2(tileForCharacter.X * Game1.tileSize, tileForCharacter.Y * Game1.tileSize);
                 locObj.addCharacter(cloud);
                 Game1.player.mount = cloud;
@@ -80,8 +79,9 @@ namespace Magic.Framework.Game.Interface
                 Game1.activeClickableMenu = null;
 
                 Game1.playSound("wand");
-                Game1.warpFarmer(this.WarpTo, (int)cloud.getTileLocation().X, (int)cloud.getTileLocation().Y, false);
-                Game1.player.consumeObject(Mod.Ja.GetObjectId("Travel Core"), 1);
+                Game1.warpFarmer(this.WarpTo, (int)cloud.Tile.X, (int)cloud.Tile.Y, false);
+                var travelCore = Game1.player.Items.FirstOrDefault(u => u.DisplayName == "Travel Core");
+                Game1.player.Items.ReduceId(travelCore.ItemId, 1);
                 Game1.player.AddCustomSkillExperience(Magic.Skill, 25);
             }
 

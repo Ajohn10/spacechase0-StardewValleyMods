@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Magic.Framework.Schools;
 using SpaceCore;
 using StardewValley;
@@ -16,11 +18,7 @@ namespace Magic.Framework.Spells
         {
             if (player == Game1.player)
             {
-                foreach (var buff in Game1.buffsDisplay.otherBuffs)
-                {
-                    if (buff.source == "spell:life:haste")
-                        return false;
-                }
+                return !player.buffs.AppliedBuffs.Values.Any(u => u.source == "spell:life:haste");
             }
 
             return base.CanCast(player, level);
@@ -36,13 +34,20 @@ namespace Magic.Framework.Spells
             if (player != Game1.player)
                 return null;
 
-            foreach (var buff in Game1.buffsDisplay.otherBuffs)
-            {
-                if (buff.source == "spell:life:haste")
-                    return null;
-            }
+            if (player.buffs.AppliedBuffs.Values.Any(u => u.source == "spell:life:haste"))
+                return null;
 
-            Game1.buffsDisplay.addOtherBuff(new Buff(0, 0, 0, 0, 0, 0, 0, 0, 0, level + 1, 0, 0, 60 + level * 120, "spell:life:haste", "Haste (spell)"));
+            player.buffs.Apply(new Buff(
+                id: "spacechase0.magic.haste",
+                source: "spell:life:haste",
+                displaySource: "Haste (spell)",
+                duration: (int)TimeSpan.FromSeconds(60 + level * 120).TotalMilliseconds,
+                effects: new StardewValley.Buffs.BuffEffects
+                {
+                    Speed = { level + 1 }
+                }
+            ));
+
             player.AddCustomSkillExperience(Magic.Skill, 5);
             return null;
         }

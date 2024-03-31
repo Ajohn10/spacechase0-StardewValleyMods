@@ -26,7 +26,7 @@ namespace Magic
         public static Mod Instance;
         public static Configuration Config { get; private set; }
 
-        public static IJsonAssetsApi Ja;
+        public static SpaceShared.APIs.IJsonAssetsApi Ja;
         public static IManaBarApi Mana;
 
         /// <summary>Whether Stardew Valley Expanded is installed.</summary>
@@ -58,6 +58,8 @@ namespace Magic
 
             Framework.Magic.Init(helper.Events, helper.Input, helper.ModRegistry, helper.Multiplayer.GetNewID);
             ConsoleCommandHelper.RegisterCommandsInAssembly(this);
+            GameLocation.RegisterTileAction("MagicAltar", Magic.Framework.Magic.HandleMagicAltar);
+            GameLocation.RegisterTileAction("MagicRadio", Magic.Framework.Magic.HandleMagicRadio);
         }
 
         /// <summary>Get an API that other mods can access. This is always called after <see cref="M:StardewModdingAPI.Mod.Entry(StardewModdingAPI.IModHelper)" />.</summary>
@@ -225,7 +227,7 @@ namespace Magic
 
             // hook Json Assets
             {
-                var api = this.Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
+                var api = this.Helper.ModRegistry.GetApi<SpaceShared.APIs.IJsonAssetsApi>("spacechase0.JsonAssets");
                 if (api == null)
                 {
                     Log.Error("No Json Assets API???");

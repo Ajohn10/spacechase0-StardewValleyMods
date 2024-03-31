@@ -82,7 +82,7 @@ namespace JsonAssets.Data
                 SpriteIndex = 0,
                 Edibility = Edibility,
                 IsDrink = EdibleIsDrink,
-                Buffs = [ new()
+                Buffs = new List<StardewValley.GameData.Objects.ObjectBuffData> { new()
                 {
                     CustomAttributes = new()
                     {
@@ -98,7 +98,7 @@ namespace JsonAssets.Data
                         Attack = EdibleBuffs.Attack,
                     },
                     Duration = EdibleBuffs.Duration,
-                } ],
+                } },
                 ContextTags = ctx,
                 ExcludeFromShippingCollection = HideFromShippingCollection,
             };
